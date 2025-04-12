@@ -1,0 +1,142 @@
+using System;
+using System.Collections.Generic;
+
+namespace RestaurantMenuApp
+{
+    public class MenuItem
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public string Category { get; set; }
+        public bool IsNew { get; set; }
+
+        public MenuItem(string name, string description, decimal price, string category, bool isNew)
+        {
+            Name = name;
+            Description = description;
+            Price = price;
+            Category = category;
+            IsNew = isNew;
+        }
+
+        public void Display()
+        {
+            Console.WriteLine($"{Name} - ${Price}");
+            Console.WriteLine($"Category: {Category}");
+            Console.WriteLine(Description);
+            Console.WriteLine(IsNew ? "🌟 New Item!" : "");
+            Console.WriteLine("-----------------------------");
+        }
+    }
+
+    public class Menu
+    {
+        public List<MenuItem> Items { get; set; }
+        public DateTime LastUpdated { get; set; }
+
+        public Menu(List<MenuItem> items)
+        {
+            Items = items;
+            LastUpdated = DateTime.Now;
+        }
+
+        public void AddMenuItem(MenuItem item)
+        {
+            Items.Add(item);
+            LastUpdated = DateTime.Now;
+        }
+
+        public void RemoveMenuItem(string name)
+        {
+            Items.RemoveAll(i => i.Name.ToLower() == name.ToLower());
+            LastUpdated = DateTime.Now;
+        }
+
+        public void DisplayMenu()
+        {
+            Console.WriteLine("\n=== Restaurant Menu ===");
+            foreach (var item in Items)
+            {
+                item.Display();
+            }
+            Console.WriteLine($"Last updated: {LastUpdated}");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var item1 = new MenuItem("Bruschetta", "Grilled bread with tomatoes and basil.", 6.99m, "Appetizer", true);
+            var item2 = new MenuItem("Grilled Salmon", "Fresh salmon with herbs.", 18.99m, "Main Course", false);
+            var item3 = new MenuItem("Chocolate Lava Cake", "Rich chocolate cake with molten center.", 7.99m, "Dessert", true);
+
+            var menu = new Menu(new List<MenuItem> { item1, item2, item3 });
+
+            Console.WriteLine("Welcome to the Restaurant Menu Admin Panel!");
+            AdminPanel(menu);
+        }
+
+        static void AdminPanel(Menu menu)
+        {
+            while (true)
+            {
+                Console.WriteLine("\n--- Admin Panel ---");
+                Console.WriteLine("1. Display Menu");
+                Console.WriteLine("2. Add New Menu Item");
+                Console.WriteLine("3. Remove Menu Item");
+                Console.WriteLine("4. Exit");
+                Console.Write("Select an option: ");
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        menu.DisplayMenu();
+                        break;
+
+                    case "2":
+                        Console.Write("Enter item name: ");
+                        string name = Console.ReadLine();
+
+                        Console.Write("Enter description: ");
+                        string description = Console.ReadLine();
+
+                        Console.Write("Enter price: ");
+                        decimal price;
+                        while (!decimal.TryParse(Console.ReadLine(), out price))
+                        {
+                            Console.Write("Invalid input. Enter a valid price: ");
+                        }
+
+                        Console.Write("Enter category (Appetizer/Main Course/Dessert): ");
+                        string category = Console.ReadLine();
+
+                        Console.Write("Is this item new? (yes/no): ");
+                        bool isNew = Console.ReadLine().ToLower() == "yes";
+
+                        var newItem = new MenuItem(name, description, price, category, isNew);
+                        menu.AddMenuItem(newItem);
+                        Console.WriteLine("✅ Menu item added.");
+                        break;
+
+                    case "3":
+                        Console.Write("Enter the name of the item to remove: ");
+                        string removeName = Console.ReadLine();
+                        menu.RemoveMenuItem(removeName);
+                        Console.WriteLine("✅ If item existed, it was removed.");
+                        break;
+
+                    case "4":
+                        Console.WriteLine("Exiting Admin Panel. Goodbye!");
+                        return;
+
+                    default:
+                        Console.WriteLine("Invalid option. Please try again.");
+                        break;
+                }
+            }
+        }
+    }
+}
